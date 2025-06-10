@@ -239,25 +239,25 @@
         -580,
         -140
       ],
-      "webhookId": "51e91d49-351f-40ea-9279-fb8d5725fa81"
+      "webhookId": ""
     },
     {
       "parameters": {
         "resource": "table",
         "workbook": {
           "__rl": true,
-          "value": "=23F14209EB128475!s967f532408d64c81b32337abeb1036fe",
+          "value": "",
           "mode": "id"
         },
         "worksheet": {
           "__rl": true,
-          "value": "{00000000-0001-0000-0000-000000000000}",
+          "value": "",
           "mode": "list",
           "cachedResultName": "erros"
         },
         "table": {
           "__rl": true,
-          "value": "{DAA660D3-0C2B-4B63-A434-41EE610A6F44}",
+          "value": "",
           "mode": "list",
           "cachedResultName": "TabelaErros"
         },
@@ -322,17 +322,17 @@
           "query": {},
           "body": {
             "submittedAt": "2025-06-03T15:41:40.214Z",
-            "envio": "texto",
-            "Mensagem": "Teste",
-            "Numeros": "+ 55 11 96579-3880\n5511965793880\n5511965793880",
-            "MENSAGEM (2)": "Claudio\nJosé\nHenrique",
-            "MENSAGEM (3)": "Alphaville",
-            "url": "https://evolution-api.mididitaliza.shop",
-            "instancia": "Miguel Augusto",
-            "apikey": "52D90FAD29D9-48BE-9A39-8CAEFF4F44A8"
+            "envio": ,
+            "Mensagem": ,
+            "Numeros": ,
+            "MENSAGEM (2)": ,
+            "MENSAGEM (3)": ,
+            "url":,
+            "instancia": ,
+            "apikey": 
           },
-          "webhookUrl": "https://api.mididitaliza.shop/webhook-test/disparo-aula",
-          "executionMode": "test"
+          "webhookUrl": ,
+          "executionMode": 
         }
       }
     ]
