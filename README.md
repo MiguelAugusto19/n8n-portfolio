@@ -64,7 +64,8 @@ Ideal para:
 
 ## 🔁 Demonstração visual do fluxo
 
-![Fluxo N8N - Disparador em Massa](./fbfb7606-fb8c-4051-98c9-e1be140ef354.png)
+![Fluxo N8N - Disparador em Massa](![image](https://github.com/user-attachments/assets/aed7f127-7adc-4ac0-aa73-acecaa40243e)
+)
 
 ---
 
