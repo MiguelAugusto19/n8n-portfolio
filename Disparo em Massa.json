@@ -1,0 +1,472 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $item(\"0\").$node[\"Webhook\"].json[\"body\"][\"url\"] }}/message/sendText/{{ $item(\"0\").$node[\"Webhook\"].json[\"body\"][\"instancia\"] }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "={{ $item(\"0\").$node[\"Webhook\"].json[\"body\"][\"apikey\"] }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "number",
+              "value": "={{ $('Loop Over Items').item.json.novonum }}"
+            },
+            {
+              "name": "text",
+              "value": "={{ $item(\"0\").$node[\"OpenAI\"].json[\"message\"][\"content\"] }}"
+            }
+          ]
+        },
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "id": "004d7b39-610e-4e96-a4fd-ccb49b82b1cb",
+      "name": "HTTP Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        840,
+        -140
+      ],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "novonum, Nome",
+        "options": {
+          "includeBinary": true
+        }
+      },
+      "id": "fd484572-8846-4a9d-ae36-6f550b20d97e",
+      "name": "Split Out",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        40,
+        -160
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "62692e80-ce81-42d5-92aa-fc14860d0329",
+              "name": "novonum",
+              "value": "={{ (() => {\n    const numerosString = $item(\"0\").$node[\"Webhook\"].json[\"body\"][\"Numeros\"];\n    const numerosArray = numerosString.split('\\n').filter(num => num !== '');\n    return numerosArray;\n})() }}",
+              "type": "array"
+            },
+            {
+              "id": "9a991a13-03cf-4b92-b652-d56918177086",
+              "name": "Nome",
+              "value": "={{ $item(\"0\").$node[\"Webhook\"].json[\"body\"][\"MENSAGEM (2)\"].split('\\n').map(n => n.trim()) }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "cfb8e187-4175-408d-b5d8-33e60e2f4393",
+      "name": "Edit Fields",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -380,
+        -140
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "a584726d-c8ab-41de-b587-d12ed58a796d",
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        280,
+        -160
+      ]
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Crie uma variação do texto: \"Olá!{{ $json.Nome }}, {{ $item(\"0\").$node[\"Webhook\"].json[\"body\"][\"Mensagem\"] }}\", mantenha exatamente o mesmo sentido, acrescente emojis. Sua resposta deve ser apenas o texto editado!"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "c93abe6a-85ac-433c-9054-9f4fe0b5b061",
+      "name": "OpenAI",
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.5,
+      "position": [
+        500,
+        -140
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "SPzfVsMg2DJgsWz5",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Executa o código de geração do número aleatório\nconst min = 1;\nconst max = 30;\nconst randomNumber = Math.floor(Math.random() * (max - min + 1)) + min;\n\n// Retorna o valor em um array de objetos com a propriedade \"json\"\nreturn [\n  {\n    json: {\n      randomNumber: randomNumber,\n    },\n  },\n];"
+      },
+      "id": "97ef202c-3a9f-478a-a2d9-7a872ef275a2",
+      "name": "Code",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1060,
+        -140
+      ]
+    },
+    {
+      "parameters": {
+        "amount": "={{ $item(\"0\").$node[\"Code\"].json[\"randomNumber\"] }}"
+      },
+      "id": "f0279ae2-5fb1-435f-b51f-a1d36b41f3b1",
+      "name": "Wait",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1260,
+        -140
+      ],
+      "webhookId": "46138c81-712b-4cf0-b414-69ad59881350"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $item(\"0\").$node[\"Webhook\"].json[\"body\"][\"envio\"] }}",
+                    "rightValue": "texto",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "texto"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "1f3271ce-385f-4dce-b681-6a1f5d9235f6",
+                    "leftValue": "={{ $('Webhook').item.json.body.envio }}",
+                    "rightValue": "imagem",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "imagem"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "23d59bb9-567d-4be1-8dc0-a55d145a1de1",
+      "name": "Switch",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -200,
+        -140
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "disparo-aula",
+        "options": {}
+      },
+      "id": "d4a67b6d-50e2-4950-a047-f8b4fe4ae496",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -580,
+        -140
+      ],
+      "webhookId": "51e91d49-351f-40ea-9279-fb8d5725fa81"
+    },
+    {
+      "parameters": {
+        "resource": "table",
+        "workbook": {
+          "__rl": true,
+          "value": "=23F14209EB128475!s967f532408d64c81b32337abeb1036fe",
+          "mode": "id"
+        },
+        "worksheet": {
+          "__rl": true,
+          "value": "{00000000-0001-0000-0000-000000000000}",
+          "mode": "list",
+          "cachedResultName": "erros"
+        },
+        "table": {
+          "__rl": true,
+          "value": "{DAA660D3-0C2B-4B63-A434-41EE610A6F44}",
+          "mode": "list",
+          "cachedResultName": "TabelaErros"
+        },
+        "fieldsUi": {
+          "values": [
+            {
+              "column": "Numero",
+              "fieldValue": "='{{ $('Loop Over Items').item.json.novonum }}"
+            },
+            {
+              "column": "Cliente",
+              "fieldValue": "={{ $('Loop Over Items').item.json.Nome }}"
+            },
+            {
+              "column": "Cidade",
+              "fieldValue": "={{ $('Webhook').item.json.body[\"MENSAGEM (3)\"] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.microsoftExcel",
+      "typeVersion": 2.1,
+      "position": [
+        1080,
+        80
+      ],
+      "id": "b825acd9-7f20-4778-899d-64a0ee734be7",
+      "name": "Microsoft Excel 365",
+      "credentials": {
+        "microsoftExcelOAuth2Api": {
+          "id": "ODkqDcPHbayC898b",
+          "name": "Microsoft Excel account"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "host": "n8n.mididitaliza.shop",
+            "user-agent": "node",
+            "content-length": "327",
+            "accept": "*/*",
+            "accept-encoding": "br, gzip, deflate",
+            "accept-language": "*",
+            "baggage": "sentry-environment=production,sentry-release=aee2464342c29296891e57bcee0ea0603177ca5c,sentry-public_key=e5dde145dc9f6d7a3a558ee8ee1ab3a5,sentry-trace_id=6d25a9d116399f236a22ea22d5bac953",
+            "content-type": "application/json",
+            "sec-fetch-mode": "cors",
+            "sentry-trace": "6d25a9d116399f236a22ea22d5bac953-bfd0c97aa7dd9995",
+            "x-forwarded-for": "13.40.170.174",
+            "x-forwarded-host": "n8n.mididitaliza.shop",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "39797f0cfde5",
+            "x-real-ip": "13.40.170.174",
+            "x-vercel-id": "gru1::5nbt4-1748965300102-ce7c3896d6e2"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "submittedAt": "2025-06-03T15:41:40.214Z",
+            "envio": "texto",
+            "Mensagem": "Teste",
+            "Numeros": "+ 55 11 96579-3880\n5511965793880\n5511965793880",
+            "MENSAGEM (2)": "Claudio\nJosé\nHenrique",
+            "MENSAGEM (3)": "Alphaville",
+            "url": "https://evolution-api.mididitaliza.shop",
+            "instancia": "Miguel Augusto",
+            "apikey": "52D90FAD29D9-48BE-9A39-8CAEFF4F44A8"
+          },
+          "webhookUrl": "https://api.mididitaliza.shop/webhook-test/disparo-aula",
+          "executionMode": "test"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "OpenAI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Microsoft Excel 365",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Microsoft Excel 365": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "e9e807a8-c49e-47ec-8384-4b66e3d8c529",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "691993c9d2a1fb102a1cadbcc53653e912e6608d733364b3cc39e557457b443e"
+  },
+  "id": "2VDytZ0O4f1gbmIo",
+  "tags": []
+}
